@@ -66,6 +66,11 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Root route for Render Health Checks (Render pings / by default)
+app.get('/', (req, res) => {
+  res.status(200).send('Blockchain Voting API is running.');
+});
+
 app.listen(PORT, async () => {
   console.log(`Blockchain Voting API running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/api/health`);

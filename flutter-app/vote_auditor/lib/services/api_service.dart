@@ -7,7 +7,7 @@ class ApiService {
   // Example: 'https://my-vote-api.onrender.com/api'
   static String get baseUrl {
     if (kIsWeb && Uri.base.host != 'localhost') {
-      return 'https://YOUR_RENDER_URL_HERE.onrender.com/api';
+      return 'https://enterprise-blockchain-voting-system.onrender.com/api';
     }
     return 'http://localhost:3000/api';
   }
