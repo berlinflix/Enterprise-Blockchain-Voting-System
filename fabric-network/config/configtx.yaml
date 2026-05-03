@@ -1,0 +1,154 @@
+Organizations:
+  - &OrdererOrg
+    Name: OrdererOrg
+    ID: OrdererMSP
+    MSPDir: crypto-config/ordererOrganizations/example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('OrdererMSP.admin')"
+
+  - &ElectionCommission
+    Name: ElectionCommissionMSP
+    ID: ElectionCommissionMSP
+    MSPDir: crypto-config/peerOrganizations/electioncommission.example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('ElectionCommissionMSP.admin', 'ElectionCommissionMSP.peer', 'ElectionCommissionMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('ElectionCommissionMSP.admin', 'ElectionCommissionMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('ElectionCommissionMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('ElectionCommissionMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.electioncommission.example.com
+        Port: 7051
+
+  - &IndependentAuditor
+    Name: IndependentAuditorMSP
+    ID: IndependentAuditorMSP
+    MSPDir: crypto-config/peerOrganizations/independentauditor.example.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('IndependentAuditorMSP.admin', 'IndependentAuditorMSP.peer', 'IndependentAuditorMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('IndependentAuditorMSP.admin', 'IndependentAuditorMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('IndependentAuditorMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('IndependentAuditorMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.independentauditor.example.com
+        Port: 9051
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V2_0: true
+  Orderer: &OrdererCapabilities
+    V2_0: true
+  Application: &ApplicationCapabilities
+    V2_0: true
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+    Endorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+  OrdererType: etcdraft
+  Addresses:
+    - orderer.example.com:7050
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 512 KB
+  EtcdRaft:
+    Consenters:
+      - Host: orderer.example.com
+        Port: 7050
+        ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
+        ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/server.crt
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+  Capabilities:
+    <<: *OrdererCapabilities
+
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
+
+Profiles:
+  VoteOrdererGenesis:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+    Consortiums:
+      VoteConsortium:
+        Organizations:
+          - *ElectionCommission
+          - *IndependentAuditor
+
+  VoteChannel:
+    Consortium: VoteConsortium
+    <<: *ChannelDefaults
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *ElectionCommission
+        - *IndependentAuditor

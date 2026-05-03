@@ -1,0 +1,18 @@
+{
+  "name": "vote-api",
+  "version": "1.0.0",
+  "description": "Blockchain Voting System - Express.js REST API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.3",
+    "@hyperledger/fabric-gateway": "^1.10.1",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  }
+}

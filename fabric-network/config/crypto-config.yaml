@@ -1,0 +1,29 @@
+OrdererOrgs:
+  - Name: Orderer
+    Domain: example.com
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: orderer
+        SANS:
+          - localhost
+
+PeerOrgs:
+  - Name: ElectionCommission
+    Domain: electioncommission.example.com
+    EnableNodeOUs: true
+    Template:
+      Count: 1
+      SANS:
+        - localhost
+    Users:
+      Count: 1
+
+  - Name: IndependentAuditor
+    Domain: independentauditor.example.com
+    EnableNodeOUs: true
+    Template:
+      Count: 1
+      SANS:
+        - localhost
+    Users:
+      Count: 1
